@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bidnet.client.ui.LoginController"
+      alignment="CENTER" spacing="14.0" stylesheets="@styles.css"
+      styleClass="root-pane">
+    <padding>
+        <Insets top="25.0" right="30.0" bottom="25.0" left="30.0"/>
+    </padding>
+
+    <Label text="BidNet" styleClass="header-title">
+        <font>
+            <Font name="System Bold" size="28.0"/>
+        </font>
+    </Label>
+    <Label text="Real-Time Distributed Auction Platform" styleClass="header-subtitle"/>
+
+    <GridPane hgap="10.0" vgap="12.0">
+        <columnConstraints>
+            <ColumnConstraints minWidth="100.0" prefWidth="110.0"/>
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200.0"/>
+        </columnConstraints>
+
+        <Label text="Server Host:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtHost" text="127.0.0.1" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Server Port:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtPort" text="5000" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Username:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtUsername" promptText="e.g. admin or User1" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Password:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <PasswordField fx:id="txtPassword" promptText="Enter password" text="1234" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Auction ID:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtAuctionId" text="A-999" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Label fx:id="lblError" textFill="#e74c3c" wrapText="true"/>
+
+    <Button text="Connect &amp; Join Auction" onAction="#onLoginClicked"
+            maxWidth="Infinity" styleClass="action-btn" defaultButton="true"/>
+</VBox>

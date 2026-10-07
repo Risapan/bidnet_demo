@@ -1,0 +1,145 @@
+```mermaid
+classDiagram
+    class BidNetServer {
+        -int PORT
+        -ExecutorService threadPool
+        -boolean isRunning
+        +start() void
+        +stop() void
+        +main(args) void
+    }
+
+    class ClientHandler {
+        -Socket socket
+        -BufferedReader in
+        -PrintWriter out
+        -String clientId
+        -long lastHeartbeatAck
+        +run() void
+        +sendMessage(String json) void
+        +handleDisconnect() void
+    }
+
+    class ConnectionManager {
+        -ConnectionManager instance$
+        -ConcurrentHashMap~String, ClientHandler~ clients
+        +getInstance()$ ConnectionManager
+        +addClient(String id, ClientHandler handler) void
+        +removeClient(ClientHandler handler) void
+        +getHandler(String id) ClientHandler
+    }
+
+    class MessageRouter {
+        -MessageRouter instance$
+        +getInstance()$ MessageRouter
+        +route(ClientHandler handler, String rawJson) void
+    }
+
+    class Message {
+        -MessageType type
+        -String senderId
+        -String auctionId
+        -String payload
+        +toJson() String
+        +fromJson(String json)$ Message
+    }
+
+    class MessageType {
+        <<enumeration>>
+        LOGIN
+        LOGIN_RESPONSE
+        JOIN_AUCTION
+        LEAVE_AUCTION
+        PLACE_BID
+        BID_ACCEPTED
+        BID_REJECTED
+        AUCTION_UPDATE
+        AUCTION_START
+        HEARTBEAT
+        HEARTBEAT_ACK
+        RECONNECT
+        ERROR
+    }
+
+    class Auction {
+        -String auctionId
+        -String title
+        -double currentBid
+        -String highestBidderId
+        -boolean isActive
+        -ReentrantLock lock
+        +updateBid(double bid, String bidder) void
+        +getLock() ReentrantLock
+        +endAuction() void
+    }
+
+    class BidProcessor {
+        +process(Message msg)$ void
+        +parseAmount(String payload)$ double
+    }
+
+    class BroadcastManager {
+        -ConcurrentHashMap~String, Set~String~~ subscriptions$
+        +subscribe(String auctionId, String userId)$ void
+        +broadcastUpdate(Auction auction)$ void
+        +broadcastEnd(Auction auction)$ void
+    }
+
+    class TimerManager {
+        -ScheduledExecutorService scheduler$
+        +scheduleEnd(Auction auction, long delaySec)$ void
+    }
+
+    class HeartbeatService {
+        -long TIMEOUT_THRESHOLD_MS$
+        +start()$ void
+        -pingAll()$ void
+    }
+
+    class MongoDbManager {
+        -String URI$
+        -MongoClient mongoClient$
+        -MongoDatabase database$
+        +connect()$ void
+        +getDb()$ MongoDatabase
+    }
+
+    class AuctionRepository {
+        -ExecutorService dbExecutor$
+        +saveResult(String auctionId, String winner, double price)$ void
+        +saveBidAsync(String auctionId, String userId, double amount)$ void
+    }
+
+    class BidNetClient {
+        -Socket socket
+        -PrintWriter out
+        -BufferedReader in
+        -MessageListener listener
+        +connect(String host, int port) void
+        +startListening() void
+        +sendMessage(String json) void
+        +setListener(MessageListener listener) void
+    }
+
+    class AuctionController {
+        -Label lblCurrentBid
+        -Label lblHighestBidder
+        -TextField txtBidAmount
+        +updateUiSafe(double bid, String bidder) void
+        +onPlaceBidClicked() void
+    }
+
+    BidNetServer --> ClientHandler : spawns
+    ClientHandler --> ConnectionManager : registers
+    ClientHandler --> MessageRouter : dispatches
+    MessageRouter --> Message : decodes
+    Message --> MessageType : uses
+    MessageRouter --> BidProcessor : invokes
+    BidProcessor --> Auction : locks & updates
+    BidProcessor --> BroadcastManager : notifies
+    BidProcessor --> AuctionRepository : async save
+    BroadcastManager --> ConnectionManager : queries handlers
+    TimerManager --> Auction : schedules close
+    AuctionRepository --> MongoDbManager : persists to
+    AuctionController --> BidNetClient : uses
+```

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bidnet.client.ui.AuctionController"
+            stylesheets="@styles.css" styleClass="root-pane">
+    <top>
+        <VBox spacing="6.0" alignment="CENTER" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="15.0" bottom="15.0" left="20.0" right="20.0"/>
+            </padding>
+            <Label fx:id="lblAuctionTitle" text="MacBook Pro M3 Max (A-999)" styleClass="header-title">
+                <font>
+                    <Font name="System Bold" size="22.0"/>
+                </font>
+            </Label>
+            <Label fx:id="lblStatusMessage" text="Live bidding in progress..." styleClass="status-active"/>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="20.0" alignment="CENTER" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="10.0" bottom="20.0" left="30.0" right="30.0"/>
+            </padding>
+
+            <HBox spacing="15.0" alignment="CENTER" styleClass="card-box">
+                <VBox alignment="CENTER" spacing="5.0">
+                    <Label text="Current Highest Bid" styleClass="metric-label"/>
+                    <Label fx:id="lblCurrentBid" text="Rs. 200,000.00" styleClass="metric-value-bid"/>
+                </VBox>
+                <Separator orientation="VERTICAL"/>
+                <VBox alignment="CENTER" spacing="5.0">
+                    <Label text="Highest Bidder" styleClass="metric-label"/>
+                    <Label fx:id="lblHighestBidder" text="None" styleClass="metric-value-user"/>
+                </VBox>
+            </HBox>
+
+            <VBox spacing="10.0" alignment="CENTER" maxWidth="400.0">
+                <Label text="Enter Your Bid (min. 5% increment):" styleClass="input-label"/>
+                <HBox spacing="10.0" alignment="CENTER">
+                    <TextField fx:id="txtBidAmount" promptText="e.g. 210000" HBox.hgrow="ALWAYS" styleClass="bid-input"/>
+                    <Button fx:id="btnPlaceBid" text="Place Bid" onAction="#onPlaceBidClicked" styleClass="bid-btn" defaultButton="true"/>
+                </HBox>
+            </VBox>
+
+            <Button fx:id="btnAdminStart" text="Admin: Trigger 60s Auction Countdown" onAction="#onAdminStartClicked"
+                    styleClass="admin-btn" visible="false" managed="false"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="8.0" bottom="12.0"/>
+            </padding>
+            <Label text="BidNet Distributed System | University of Ruhuna EC5205" styleClass="footer-text"/>
+        </HBox>
+    </bottom>
+</BorderPane>

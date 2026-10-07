@@ -1,0 +1,47 @@
+```mermaid
+sequenceDiagram
+    autonumber
+    actor ClientA as Bidder Client A
+    actor ClientB as Bidder Client B
+    participant Server as BidNetServer
+    participant HandlerA as ClientHandler (A)
+    participant Auth as AuthService
+    participant Router as MessageRouter
+    participant Engine as BidProcessor
+    participant Auction as Auction (A-999)
+    participant Bcast as BroadcastManager
+    participant DB as MongoDB (Async Worker)
+
+    Note over ClientA, Server: Phase 1: TCP Handshake & Authentication
+    ClientA->>Server: TCP Connect (Port 5000)
+    Server-->>HandlerA: Spawn Handler in ThreadPool
+    ClientA->>HandlerA: LOGIN {"username":"UserA", "password":"***"}
+    HandlerA->>Router: route(rawJson)
+    Router->>Auth: handleLogin()
+    Auth->>Auth: BCrypt Verify Credentials
+    Auth-->>ClientA: LOGIN_RESPONSE {"success":true}
+
+    Note over ClientA, Server: Phase 2: Join Auction Room
+    ClientA->>HandlerA: JOIN_AUCTION (A-999)
+    HandlerA->>Bcast: subscribe("A-999", "UserA")
+    HandlerA-->>ClientA: AUCTION_UPDATE (Current state)
+
+    Note over ClientA, ClientB: Phase 3: Critical Section Bidding
+    ClientA->>HandlerA: PLACE_BID {"amount": 250000.0}
+    HandlerA->>Router: route(PLACE_BID)
+    Router->>Engine: process(msg)
+    Engine->>Auction: lock.lock() (Fair ReentrantLock)
+    Note over Auction: Critical Section Active
+    Engine->>Auction: Validate 5% min increment
+    Engine->>Auction: updateBid(250000.0, "UserA")
+    Engine->>Auction: lock.unlock() (finally block)
+
+    Note over Engine, ClientB: Phase 4: Non-blocking Broadcast & Async DB Persist
+    par TCP Real-time Fan-out
+        Engine->>Bcast: broadcastUpdate(auction)
+        Bcast-->>ClientA: AUCTION_UPDATE {"currentBid":250000, "highestBidder":"UserA"}
+        Bcast-->>ClientB: AUCTION_UPDATE {"currentBid":250000, "highestBidder":"UserA"}
+    and Asynchronous Write
+        Engine-)DB: saveBidAsync("A-999", "UserA", 250000.0)
+    end
+```

@@ -1,0 +1,6 @@
+com/bidnet/client/ui/AuctionController.class
+com/bidnet/client/ui/LoginController.class
+com/bidnet/client/network/BidNetClient.class
+com/bidnet/client/ui/Main.class
+com/bidnet/client/network/MessageListener.class
+com/bidnet/client/ui/ConsoleBidder.class
