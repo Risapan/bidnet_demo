@@ -113,14 +113,15 @@ public class AuctionController {
     public void onPlaceBidClicked() {
         try {
             double newBid = Double.parseDouble(txtBidAmount.getText().trim());
-            // Construct JSON (Slide 40)
-            String payload = String.format("{\"amount\":%s}", newBid);
-            String msg = String.format(
-                    "{\"type\":\"PLACE_BID\", \"auctionId\":\"%s\", " +
-                    "\"senderId\":\"%s\", \"payload\":\"%s\"}",
-                    currentAuctionId, currentUser, payload);
+            JsonObject payload = new JsonObject();
+            payload.addProperty("amount", newBid);
+            JsonObject msg = new JsonObject();
+            msg.addProperty("type", "PLACE_BID");
+            msg.addProperty("auctionId", currentAuctionId);
+            msg.addProperty("senderId", currentUser);
+            msg.addProperty("payload", payload.toString());
 
-            networkClient.sendMessage(msg);
+            networkClient.sendMessage(msg.toString());
             txtBidAmount.clear();
         } catch (NumberFormatException e) {
             lblStatusMessage.setText("Invalid amount format");
